@@ -84,13 +84,6 @@ class AssetTransfer extends Contract {
     // Transferencia de propiedad
     async TransferOwnership(ctx, objectID, newOwner) {
         const device = await this._getDevice(ctx, objectID);
-        const invoker = await this._getInvoker(ctx);
-
-        const currentOwner = device.OwnersHistory[device.OwnersHistory.length - 1];
-        if (currentOwner && currentOwner !== invoker) {
-            throw new Error('Only the current owner can transfer ownership');
-        }
-
         device.OwnersHistory.push(newOwner);
         device.Controllers = [newOwner];
         device.Status = 'active';
@@ -103,12 +96,6 @@ class AssetTransfer extends Contract {
     // Asignación de un controlador
     async AssignController(ctx, objectID, controllerID) {
         const device = await this._getDevice(ctx, objectID);
-        const invoker = await this._getInvoker(ctx);
-
-        const currentOwner = device.OwnersHistory[device.OwnersHistory.length - 1];
-        if (currentOwner !== invoker) {
-            throw new Error('Only the owner can assign controllers');
-        }
 
         if (!device.Controllers.includes(controllerID)) {
             device.Controllers.push(controllerID);
@@ -122,13 +109,6 @@ class AssetTransfer extends Contract {
     // Revocación de un controlador
     async RevokeController(ctx, objectID, controllerID) {
         const device = await this._getDevice(ctx, objectID);
-        const invoker = await this._getInvoker(ctx);
-
-        const currentOwner = device.OwnersHistory[device.OwnersHistory.length - 1];
-        if (currentOwner !== invoker) {
-            throw new Error('Only the owner can revoke controllers');
-        }
-
         device.Controllers = device.Controllers.filter(id => id !== controllerID);
         device.LastUpdate = "";
 
@@ -139,13 +119,6 @@ class AssetTransfer extends Contract {
     // Marcado como inactivo
     async DeleteDevice(ctx, objectID) {
         const device = await this._getDevice(ctx, objectID);
-        const invoker = await this._getInvoker(ctx);
-
-        const currentOwner = device.OwnersHistory[device.OwnersHistory.length - 1];
-        if (currentOwner !== invoker) {
-            throw new Error('Only the owner can deactivate the device');
-        }
-
         device.Status = 'inactive';
         device.LastUpdate = "";
 
